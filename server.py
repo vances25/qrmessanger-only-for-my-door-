@@ -47,7 +47,7 @@ async def web_message(data: Message):
 
 
 
-@app.get("/send")
+@app.get("/")
 async def client_send(request: Request):
 
     return templates.TemplateResponse(request=request, name="index.html")
