@@ -39,9 +39,9 @@ def send_message(message: str):
 class Message(BaseModel):
     message: str
 @app.post("/message")
-async def web_message():
+async def web_message(data: Message):
     
-    send_message("it worked!")
+    send_message(f"🚨 NEW MESSAGE\n\n👉 {data.message}")
     
     return {"detail": "is worked!"}
 
