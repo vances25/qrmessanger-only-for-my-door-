@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Send Message!</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <style>
+:root{
+  --accent:#e0a80d; /* mustard yellow */
+  --bg:#f3f5f9;     /* soft light gray */
+  --text:#0f172a;   /* slate */
+  --muted:#475569;  /* secondary text */
+  --card:#ffffff;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font:16px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Display","SF Pro Text", "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+  color:var(--text);
+  background:var(--bg);
+}
+/* Portrait image styling */
+.portrait{
+  max-width:180px;
+  border-radius:50%;
+  box-shadow:0 4px 14px rgba(0,0,0,.15);
+  margin-bottom:20px;
+}
+
+.container{
+  display:flex; 
+  flex-direction:column; 
+  align-items:center; 
+  width: min(600px, 92%); 
+  margin:40px auto; 
+  gap:20px;
+}
+/*
+.blob{
+  position:absolute;
+  right:-8vw;
+  top:-6vh;
+  width:58vw;
+  height:120vh;
+  background:var(--accent);
+  border-bottom-left-radius:60% 50%;
+  border-top-left-radius:45% 50%;
+  z-index:-1;
+  filter: drop-shadow(0 10px 40px rgba(0,0,0,.18));
+}
+*/
+@media (max-width: 900px){
+  /*
+  .container{grid-template-columns:1fr; gap:24px; margin:24px auto;}
+  .blob{display:none}
+  */
+}
+
+.header-eyebrow{font-weight:800; letter-spacing:.06em; color:var(--accent);}
+.title{font-size: clamp(28px, 4vw, 44px); line-height:1.15; margin:8px 0 14px;}
+.subtitle{color:var(--muted); max-width:52ch;}
+
+form{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:22px;
+  width:100%;
+  max-width:520px;
+  box-shadow: 0 12px 30px rgba(15,23,42,.08);
+}
+label{display:block; font-weight:600; margin:12px 0 6px}
+input[type="text"], textarea{
+  width:100%;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid #dfe3ea;
+  background:#fff;
+  color:var(--text);
+  outline:none;
+}
+input[type="text"]:focus, textarea:focus{border-color:#b7c3d6; box-shadow:0 0 0 3px rgba(224,168,13,.18)}
+textarea{resize:vertical; min-height:120px}
+
+.button{
+  display:inline-block;
+  border:none;
+  border-radius:999px;
+  padding:12px 18px;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform .05s ease, box-shadow .2s ease, background .2s ease;
+}
+.button.primary{background:var(--accent); color:#111; box-shadow:0 6px 16px rgba(224,168,13,.35)}
+.button.primary:hover{transform:translateY(-1px)}
+    </style>
+
+</head>
+    <body>
+        <div class="container">
+          <img class="portrait" src="https://vanthedev.org/me.png" alt="Vance Schaefer">
+          <div class="header-eyebrow">QR MESSENGER</div>
+          <h1 class="title">Say hello — drop me a quick message</h1>
+          <p class="subtitle">Scan → type → send. Your note arrives instantly and pings my phone. Keep it friendly and short.</p>
+
+          <form id="msgForm">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Write your message…"></textarea>
+
+            <div style="margin-top:14px">
+              <button class="button primary" type="submit">Send message</button>
+            </div>
+          </form>
+        </div>
+
+        
+        
+    </body>
+
+<script>
+(function(){
+  const form = document.getElementById('msgForm');
+  if (!form) return;
+  const textarea = document.getElementById('message');
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    var message = textarea && textarea.value ? textarea.value.trim() : '';
+    if (!message) {
+      alert('Please enter a message.');
+      if (textarea) textarea.focus();
+      return;
+    }
+    // set loading state
+    var btn = form.querySelector('button[type="submit"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+    try {
+      const res = await fetch('/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message })
+      });
+
+      if (!res.ok) throw new Error('Request failed');
+
+      // Remove the form and show confirmation under the instructions
+      var container = document.querySelector('.container');
+      form.remove();
+      var successMsg = document.createElement('p');
+      successMsg.className = 'subtitle';
+      successMsg.textContent = 'I got your message!';
+      if (container) container.appendChild(successMsg);
+
+    } catch (err) {
+      alert('Failed to send, please try again.');
+      if (btn) { btn.disabled = false; btn.textContent = 'Send message'; }
+    }
+  });
+})();
+</script>
+
+
+</html>
